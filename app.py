@@ -469,34 +469,6 @@ def whatsapp_reply():
     return str(resp)
 
 
-#flask receive and save images
-
-
-
-@app.route("/", methods=["GET"])
-def form():
-    return render_template("upload.html")
-
-@app.route("/upload", methods=["POST"])
-def upload():
-    file = request.files.get("image")
-
-    if not file or file.filename == "":
-        return "No file selected"
-
-    filename = secure_filename(file.filename)
-    file.save(os.path.join(app.config["UPLOAD_FOLDER"], filename))
-
-    return redirect(url_for("gallery", filename=filename))
-
-
-#flask route to show the uploaded images
-
-@app.route("/gallery/<filename>")
-def gallery(filename):
-    return render_template("gallery.html", filename=filename)
-
-
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0",port=5000, debug=True)
