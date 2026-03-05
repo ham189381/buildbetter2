@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <title>Page Title</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <link rel='stylesheet' type='text/css' media='screen' href='main.css'>
+    <script src='main.js'></script>
+
+    <style>
+
+/*this displays container as a flex without wraping and also aligns the container in the 
+ center by(by setting justify-content and align-items to center)*/
+  .container{
+     display:flex;
+	 flex-wrap:nowrap;
+	 justify-content:center;
+	 align-items:center;
+	 border:0.1em solid green;
+  }
+  
+  /* this is an advanced method that makes sure that the content( the box in this case)does not flow out side of its container */
+	
+  .container::after{
+     content:"";
+	 clear:both;
+	 display:table;
+  }
+  
+  .container .box{
+     width:24%;      /*making all the boxes in the container to have a width of 24%*/
+     background-color:
+	 margin:20px;
+	 font-size:20px;
+	 line-height:25px;       /* the line-height minimises the space btn the words such that the boxes are not too long*/  
+  }
+  
+  /*this gives a green border to all the boxes in the first container (.container) but not the boxes in the second container (.container2)*/
+  
+  .container .box{
+      border:0.2px solid #65ef8a;
+	  display:flex; /*the following three statements make the contents in the box to appear in the center*/
+	  justify-content:;
+	  align-items:;
+  }
+  
+  
+  
+  
+  
+   /*giving all the th a background image which will be positioned differently for each box*/
+  
+  .container .box table th{
+	position:relative;
+  }
+  
+  .container .box:nth-child(4){
+   background-color:#7fff00;
+  }
+  
+  /*styling the divs within the th of the boxes in the container*/
+  
+  .container th .supplier{
+   background-color:rgba(250,253,249,0.3);
+   color:;
+   position:absolute;
+   left:0;
+   top:3em;
+   width:100%;
+   height:50%;
+   line-height:2;
+  }
+  .container th .supplier div{
+   position:absolute:
+   left:0;
+  }
+  
+  
+  .container th .supplier .name{
+    color:;
+  }
+  .container th .supplier .district{
+    color:;
+  }
+  .container th .supplier .division{
+    color:;
+  }
+  .container th .supplier .town{
+   color:;
+  }
+  .container th .supplier .phone{
+    color:blue;
+  }
+  
+  /*styling the supplire registration div*/
+  
+  .container th .register{
+   background-color:rgba(250,253,249,0.3);
+   color:black;
+   position:absolute;
+   left:0;
+   top:3em;
+   width:100%;
+   height:50%;
+   line-height:2;
+  }
+  
+  
+  /*removing the under lines frome the links*/
+  
+  .container .box a{
+    text-decoration:none;
+  }
+  
+  
+  p{ 
+     font-family:vardana, sans-serif;
+  }
+  
+
+   /* here we make the width of the images to be equal to the width of the boxes such that the images fit properly*/
+  .container img{
+     width:100%;
+	 height:20em;
+  }
+  
+ 
+  
+  /*giving the width of the boxes all the boxes*/
+  
+  .container .box{
+      width:24%;
+	  margin:0.2em;
+	  background-color:;
+  }
+  
+  /*putting a rounded corner on the bottom left of the first box in the container*/
+  .container .box:first-child{
+     border-bottom-left-radius:20px;
+  }
+  
+  
+  
+  
+    /*this is the div that contains all the content*/
+  #hamimages{
+    position:relative;
+  }
+  
+  
+  
+  /*giving oject fit to the image in the first box of the home page*/
+  
+  .container .box .table img{
+    object-fit:cover;
+  }
+  
+  
+  
+   /*new change to make the clickable area fill the box*/
+  
+  .container .box table{
+    width:100%;
+  }
+  
+  
+  
+  /*styling the internal links inside the website*/
+  
+  
+  .links{
+    width:100%;
+	display:flex;
+	flex-wrap:no-wrap;
+	border:1px solid olive;
+	background-color:
+  }
+  
+ 
+  .links .col{
+	width:;
+	border:;
+	margin-left:1em;
+  }
+  
+  .links .col li{
+    list-style-type:;
+	margin-top:0.8em;
+	margin-left:0.6em;
+  }
+  
+  .links .col li a:hover{
+    color:green;
+  }
+  
+  .links .col li a{
+    text-decoration:none;
+  }
+  
+
+
+    </style>
+</head>
+<body>
+
+
+<div id="hamimages"><!------this div helps me to style all the images by using the descendant combinator-------> 
+ 
+ <div class="container"><!---placing the first container which also has a subcontainer(container2)--->
+
+    <div class="box">
+     <table>
+	    <tr>
+
+
+		  <th id="sprite1"><a href="#"><img src="{{ url_for('static',filename='uploads/cinotruck3.jpg') }}" alt="white lake sand rwera">
+		  
+          <div class="supplier"><!--oppening the supplire's details div-->
+			
+			<div class="name">
+			<span style="color:green" >NAME</span>:name
+			</div>
+			<div class="district">
+			<span style="color:green">DISTRICT</span>:district
+			</div>
+			
+            <div class="division">
+			<span style="color:green">DIVISION</span>:division
+			</div>
+			
+			<div class="town">
+			 TOWN:town
+			</div>
+			
+			<div class="phone">
+			 PHONE:phone
+			</div>
+			
+	      </div><!--clossing the supplire's details div-->
+			
+			</a>
+		
+          </th>
+         </tr>
+	 </table>
+   </div>
+
+    
+</body>
+
+</html>

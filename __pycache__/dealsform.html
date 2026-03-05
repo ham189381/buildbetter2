@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Deals Form</title>
+    <style>
+        body{font-family:Arial;background:#f4f4f4;}
+        form{background:white;padding:20px;width:400px;margin:auto;margin-top:40px;border-radius:10px;}
+        input{width:100%;padding:10px;margin:8px 0;}
+        button{background:green;color:white;padding:10px;border:none;width:100%;}
+    </style>
+</head>
+<body>
+
+<form action="/save" method="POST" enctype="multipart/form-data">
+    <h2>Enter Deal Info</h2>
+
+    <input type="text" name="suppliername" placeholder="Supplier Name" required>
+    <input type="text" name="materialname" placeholder="Material Name" required>
+    <input type="text" name="tippername" placeholder="Tipper Name" required>
+    <input type="text" name="location" placeholder="Location" required>
+    <input type="text" name="phone" placeholder="Phone" required>
+
+    Image One:
+    <input type="file" name="imageone" required>
+
+    Image Two:
+    <input type="file" name="image2" required>
+
+    <button type="submit">Save Deal</button>
+</form>
+
+</body>
+</html>

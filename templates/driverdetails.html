@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ENTER YOUR DETAILS - SOFERY</title>
+    <link rel="stylesheet" href="{{url_for('static', filename='driverdetailsstyles.css')}}">
+  
+</head>
+<body>
+
+<!--enctype="multipart/form-data" this is 
+added in the form to enable image file upploads-->>
+
+    <form action="/driver" method="POST" enctype="multipart/form-data">
+
+        <h1>SOFERY ENTER YOUR DETAILS</h1>
+
+        <label for="name">name</label><br>
+        <input type="text" id="name" name="name" placeholder="name" required><br><br>
+
+        <label for="district">district</label><br>
+        <input type="text" id="district" name="district" placeholder="district" required><br><br>
+
+        <label for="division">division</label><br>
+        <input type="text" id="division" name="division" placeholder="division" required><br><br>
+
+        <label for="town">town</label><br>
+        <input type="text" id="town" name="town" placeholder="town" required><br><br>
+
+        <label for="phone">phone</label><br>
+        <input type="number" id="phone" name="phone" placeholder="phone_number" required><br><br>
+
+        <label for="truck_name">enter truck name</label><br>
+        <input type="text" id="truck_name" name="truck_name" placeholder="truck_name" required><br><br>
+
+        image 1:<input type="file" name="image1" required></br>
+        image 2:<input type="file" name="image2" required></br>
+        image 3:<input type="file" name="image3" required></br></br>
+
+
+        <button type="submit">save driver</button>
+
+    </form>
+</body>
+</html>

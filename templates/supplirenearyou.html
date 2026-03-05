@@ -1,0 +1,968 @@
+<html>
+<head>
+
+<title>sofery building materials uganda</title>
+<meta name="viewport" content="width=divice-width, initial-scale=1.0">
+<meta charset="utf-8">
+
+<style>
+
+body{
+   font-family:vardana, sans-serif;
+}
+
+<!--styling the first word in the body--->
+
+body h2 #name{
+font-family: Times New Roman", Times, serif;
+}
+}
+/* making sure that the margin and padding stays inside the box such that the
+ box does not break in case these parameters are increased */
+ 
+  *{
+  box-sizing:border-box;
+  }
+  
+  
+  /*styling the header*/
+  
+  
+  /*displaying the header as a flex*/
+  .header{
+    display:flex;
+	flex-wrap:nowrap;
+	background-color:;
+	width:100%;
+	height:100px;
+	border:;
+	margin-bottom:0.4em;
+	position:relative;
+	overflow:hidden;
+  }
+ /*clear fix hack on the header*/
+ .header::after{
+   content:"";
+   clear:both;
+   display:table;
+ }
+ 
+ .header .box{
+  position:absolute;
+  border:;
+  margin-right:0.3em;
+ }
+ 
+ /*percentage width of box one in the header*/
+ .header .box.one{
+   width:10%;
+   height:100%;
+ }
+ 
+  /*using object-fit on the icon image to maintain the aspect ratio even when the dimentions change*/
+  
+ .header .box.one img{
+   width:100%;
+   height:100%;
+   object-fit:contain;
+ }
+ 
+ 
+  /* the codes bellow style the sliding images */
+
+
+ /*styling the box after box one in the header this box contains the sliding images*/
+
+   #slidercontainer{
+    overflow: hidden;
+	border:;
+	width:20%;   /*the width of the first element is 20% NOTE: the width of the next element has to add up to 100% want them to sit on the same line by giving this element the (display:inline-block;)*/
+	height:100%;
+    position:absolute;
+	left:10%; /*this is becoz the width of box one in the header is 10%*/
+  }
+  
+  #slidercontainer figure {
+    position:relative;
+	width:500%;	/*the width is made biger than 100% such that the images dont wrap there for they are horizontally alligned and they go through the right side*/
+	height:100%;
+	margin: 0;
+	left: 0;
+	padding:0.4em;
+	animation: 20s slider alternate infinite;
+  }
+  #slidercontainer figure img{
+    width: 20%;
+	height:100%;
+	float: left;
+	object-fit:cover;
+  }
+  
+  @keyframes slider{
+    0%{
+	  left: 0;
+	}
+	20%{
+	  left: 0;
+	}
+	25%{
+	  left: -100%;
+	}
+	45%{
+	  left: -100%;
+	}
+	50%{
+	  left: -200%;
+	}
+	70%{
+	  left: -200%;
+	}
+	75%{
+	  left: -300%;
+	}
+	90%{
+	  left: -300%;
+	}
+	100%{
+	  left: -400%;
+	}
+}
+
+
+
+ 
+ 
+ 
+  /*styling the contents in box two in the header*/
+ 
+ 
+ .header .box.two{
+    height:100%;
+	background-color:hsl(89%, 79%,65%);
+    display:flex;
+	flex-wrap:nowrap;
+	justify-content:center;
+	align-items:center;
+	left:32%;   /*positioning box two absolutely 30% from the left of the header*/
+ }
+ 
+ /*clea fix hack in box two*/
+ .header .box.two::after{
+   content:"";
+   clear:both;
+   display:table;
+ }
+ 
+ /*giving animation to the  div(contact) in box two of the header*/
+ 
+   .header .box.two .contact{
+      animation:ham 5s  1s linear  infinite;
+  }
+  
+  @keyframes ham{         /*these are the keyframes for the animation ham  (shear ZX)*/
+    from{
+	  transform:matrix3d(1,0,1,0,
+	                     0,1,0,0,
+						 0,0,1,0,
+						 0,0,0,1);
+	}
+	to{
+	   transform:matrix3d(1,0,0,0,
+	                      0,1,0,0,
+						  0,0,1,0,
+						  0,0,0,1);
+	}
+  }
+  
+  
+ .header .box.two .contact #phones{
+   font-family: "Times New Roman", Times, serif;
+   font-size:1.7em;
+ }
+ 
+ 
+ 
+ /*styling the contents in box three in the header*/
+ 
+  .header .box.three{
+   width:35%;
+   height:100%;
+   right:0; /*positioning box three absolutely 0px from the right of the header*/
+   top:px;  /*hidding the .box.three that contains the dropping images*/
+ }
+ 
+ 
+ 
+ 
+ /*styling the contents in box three of the header*/
+ 
+ .header .box.three .slide{   /*this absolutely positions the .slides which contain the images */
+     position:absolute;
+	 width:100%;
+	 height:100%;
+	 top:0;
+ }
+ 
+ 
+ 
+ 
+ .header .box.three .slide .moveit{
+   width:100%;
+   height:100%;
+   border:none;
+   padding:0.3em;
+   
+ }
+ 
+ .header .box.three .slide .moveit img{
+   object-fit:scale-down;
+ }
+ 
+ 
+ .header .box.three .slide .moveit .thiso{
+   width:100%;
+   height:100%;
+ }
+ 
+ 
+  .header .box.three .slide .moveit .thiso img{
+    width:100%;
+	height:100%;
+	object-fit:;
+  }
+ 
+ 
+ /*now giving different animations to the different .slides in order to translate them*/
+ 
+ .header .box.three .slide.four{
+   animation:dropfour 25s ease-in alternate-reverse infinite;
+   animation-fill-mode:;
+   display:;
+ }
+ @keyframes dropfour{
+   from{
+    transform:translatex(0px);
+    }
+   to{
+      transform:translatex(400%); 
+    }
+ }
+ 
+ .header .box.three .slide.one{
+   animation:dropon 4s  ease-out infinite;
+   animation-fill-mode:;   /*tha animation stays at its last key frame*/
+ }
+ @keyframes dropone{
+   from{
+     top:-100px;
+   }
+   to{
+     top:100px;
+   }
+ }
+ 
+ 
+ .header .box.three .slide.two{
+   animation:droptwo 20s 20s ease-in alternate-reverse infinite;
+   animation-fill-mode:bo;
+   
+ }
+ @keyframes droptwo{
+   from{
+     transform:translatex(0px);
+   }
+   to{
+     transform:translatex(400px);
+   }
+ }
+ 
+ .header .box.three .slide.three{
+   animation:dropthree 27s 20s ease-in alternate-reverse infinite; 
+   animation-fill-mode:;
+ }
+ @keyframes dropthree{
+   from{
+     transform:translatex(0px);
+   }
+   to{
+     transform:translatex(600%);
+   }
+ }
+ 
+ 
+  
+ .header .box.three .slide img{  /*making the images in the .slides to have the same width and height as the .slide container*/
+    width:100%;
+	height:100%;
+	object-fit:;
+ }
+  
+  
+  
+ 
+ /*styling the menu*/
+ 
+#myInput {
+  background-image: url('/css/searchicon.png');
+  background-position: 10px 12px;
+  background-repeat: no-repeat;
+  width: 100%;
+  font-size: 16px;
+  padding: 12px 20px 12px 40px;
+  border: 1px solid #ddd;
+  margin-bottom: 12px;
+}
+
+#myUL {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+#myUL li a {
+  border: 1px solid #ddd;
+  margin-top: -1px; /* Prevent double borders */
+  background-color: #f6f6f6;
+  padding: 12px;
+  text-decoration: none;
+  font-size: 18px;
+  color: black;
+  display: block
+}
+
+#myUL li a:hover:not(.header) {
+  background-color: #eee;
+}
+
+/*end of styling the menu*/
+
+
+
+/*styling the menu2*/
+
+
+
+        .menu-container {
+            width: 100%;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            margin-bottom:0;
+		
+        }
+
+        .menu-bar {
+            display: flex;
+            width: 100%;
+        }
+
+        .menu-item {
+            flex: 1;
+            text-align: center;
+            padding: 0.1em 10px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border-right: 1px solid #f0f0f0;
+        }
+
+        .menu-item a{
+          text-decoration:none;
+
+        }
+
+        .menu-item:last-child {
+            border-right: none;
+        }
+
+        .menu-item:hover {
+            background-color: #f8f9fa;
+            transform: translateY(-2px);
+        }
+
+        .menu-item.active {
+            background-color: #4a6ee0;
+            color: white;
+        }
+
+        .menu-item h2 {
+            font-size: 1.5rem;
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+
+        .menu-item p {
+            font-size: 0.9rem;
+            color: #666;
+            opacity: 0.8;
+        }
+
+        .menu-item.active p {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+     /* Responsive Design for the menue */
+	 
+	 
+        @media (max-width: 768px) {
+            .menu-bar {
+                flex-direction: column;
+            }
+            
+            .menu-item {
+                border-right: none;
+                border-bottom: 1px solid #f0f0f0;
+            }
+            
+            .menu-item:last-child {
+                border-bottom: none;
+            }
+            
+            .menu-item h2 {
+                font-size: 1.3rem;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .menu-item h2 {
+                font-size: 1.1rem;
+            }
+            
+            .menu-item p {
+                font-size: 0.8rem;
+            }
+            
+            h1 {
+                font-size: 1.7rem;
+            }
+        }
+
+
+
+  
+ /*this displays container as a flex without wraping and also aligns the container in the 
+ center by(by setting justify-content and align-items to center)*/
+  .container{
+     display:flex;
+	 flex-wrap:nowrap;
+	 justify-content:center;
+	 align-items:center;
+	 border:0.1em solid green;
+  }
+  
+  /* this is an advanced method that makes sure that the content( the box in this case)does not flow out side of its container */
+	
+  .container::after{
+     content:"";
+	 clear:both;
+	 display:table;
+  }
+  
+  .container .box{
+     width:24%;      /*making all the boxes in the container to have a width of 24%*/
+     background-color:
+	 margin:20px;
+	 font-size:20px;
+	 line-height:25px;       /* the line-height minimises the space btn the words such that the boxes are not too long*/  
+  }
+  
+  /*this gives a green border to all the boxes in the first container (.container) but not the boxes in the second container (.container2)*/
+  
+  .container .box{
+      border:0.2px solid #65ef8a;
+	  display:flex; /*the following three statements make the contents in the box to appear in the center*/
+	  justify-content:;
+	  align-items:;
+  }
+  
+  
+  
+  
+  
+   /*giving all the th a background image which will be positioned differently for each box*/
+  
+  .container .box table th{
+	position:relative;
+  }
+  
+  .container .box:nth-child(4){
+   background-color:#7fff00;
+  }
+  
+  /*styling the divs within the th of the boxes in the container*/
+  
+  .container th .supplier{
+   background-color:rgba(250,253,249,0.3);
+   color:;
+   position:absolute;
+   left:0;
+   top:3em;
+   width:100%;
+   height:50%;
+   line-height:2;
+  }
+  .container th .supplier div{
+   position:absolute:
+   left:0;
+  }
+  
+  
+  .container th .supplier .name{
+    color:;
+  }
+  .container th .supplier .district{
+    color:;
+  }
+  .container th .supplier .division{
+    color:;
+  }
+  .container th .supplier .town{
+   color:;
+  }
+  .container th .supplier .phone{
+    color:blue;
+  }
+  
+  /*styling the supplire registration div*/
+  
+  .container th .register{
+   background-color:rgba(250,253,249,0.3);
+   color:black;
+   position:absolute;
+   left:0;
+   top:3em;
+   width:100%;
+   height:50%;
+   line-height:2;
+  }
+  
+  
+  /*removing the under lines frome the links*/
+  
+  .container .box a{
+    text-decoration:none;
+  }
+  
+  
+  p{ 
+     font-family:vardana, sans-serif;
+  }
+  
+
+   /* here we make the width of the images to be equal to the width of the boxes such that the images fit properly*/
+  .container img{
+     width:100%;
+	 height:20em;
+  }
+  
+ 
+  
+  /*giving the width of the boxes all the boxes*/
+  
+  .container .box{
+      width:24%;
+	  margin:0.2em;
+	  background-color:;
+  }
+  
+  /*putting a rounded corner on the bottom left of the first box in the container*/
+  .container .box:first-child{
+     border-bottom-left-radius:20px;
+  }
+  
+  
+  
+  
+    /*this is the div that contains all the content*/
+  #hamimages{
+    position:relative;
+  }
+  
+  
+  
+  /*giving oject fit to the image in the first box of the home page*/
+  
+  .container .box .table img{
+    object-fit:cover;
+  }
+  
+  
+  
+   /*new change to make the clickable area fill the box*/
+  
+  .container .box table{
+    width:100%;
+  }
+  
+  
+  
+  /*styling the internal links inside the website*/
+  
+  
+  .links{
+    width:100%;
+	display:flex;
+	flex-wrap:no-wrap;
+	border:1px solid olive;
+	background-color:
+  }
+  
+ 
+  .links .col{
+	width:;
+	border:;
+	margin-left:1em;
+  }
+  
+  .links .col li{
+    list-style-type:;
+	margin-top:0.8em;
+	margin-left:0.6em;
+  }
+  
+  .links .col li a:hover{
+    color:green;
+  }
+  
+  .links .col li a{
+    text-decoration:none;
+  }
+  
+ /*styling the footer*/
+  
+  
+  footer{
+    border:1px solid green;
+    width:100%;
+	background-color:#000000;
+  }
+  
+  footer .raw{
+    display:flex;
+	flex-wrap:no-wrap;
+	
+  }
+  
+  footer .raw .col{
+    padding:1em 3em 6em 0.5em;
+	border:1px solid blue;
+  }
+  
+  
+  footer .col.one{
+    border:1px solid yellow;
+	width:55%;
+	color:#ffffff;
+	
+  }
+  
+  footer .col.two,.col.three{
+    width:22.5%;
+  }
+  
+  /*setting to default to the ul list*/
+  
+  footer .col.one ul{
+    margin:0;
+	padding:0;
+  }
+  
+  /*removing the style type markers*/
+  
+  footer .col.one ul{
+    list-style-type:none;
+	border:1px solid red;
+  }
+  
+    footer .col.one ul li{
+	  display:inline-block;  /*this aligns lists horizontaly 
+	                                  next to each other*/
+	  margin-left:2.5em;
+	}
+  
+  /*styling the elements before the lists*/
+  
+  footer .col.one ul li::before{
+    content:"";
+	display:inline-block;	/*this is important in order 4 the 
+	                                        elements to display*/
+    width:2em;
+	height:2em;
+	border:1px solid green;
+	border-radius:50%;
+	background-color:#ffffff;
+	
+	       /*lets give backgroung properties since we are going to put background images into the empty space(content:"")*/
+	background-image:;	   
+	background-repeat:no-repeat; 
+	background-size:100%;
+  }
+  
+  /*filling the empty space (content:"") before each individual list by its id using background-image*/
+  
+  footer .col.one ul #first::before{
+    background-image:url("images/youtubeicon.svg");
+  }
+  
+  footer .col.one ul #second::before{
+    background-image:url("images/whatsicon.webp");
+  }
+  
+  footer .col.one ul #third::before{
+    background-image:url("images/tiktokicon.png");
+  }
+  
+ 
+  
+  
+  /* responsiveness for tablet devices*/
+  
+  @media(max-width:800px){      
+      .container{
+	      display:flex;
+	      flex-wrap:wrap;
+	  }
+	  
+	  .container .box{
+	     width:25%;
+	  }
+	  
+	  
+	}
+	
+	@media(min-width:602px) and (max-width:802px){
+	  .container{
+	      display:flex;
+	      flex-wrap:wrap;
+	  }
+	  
+	  .container .box{
+	     width:48%;
+	  }
+	}
+	
+/*responsiveness for mobile devices*/
+	
+   @media(max-width:600px){
+      .container .box{
+	    width:46%;
+	  }
+	  
+	   .menu{
+	    display:none; /*hiding the menu on small devices*/
+	  }
+	  
+	  .header .box.two{
+	    display:none;
+	  }
+	  
+	  .header .box.one{
+         width:20%;
+         height:100%;
+        }
+		
+		#slidercontainer{
+		   width:40%;
+		   height:100%;
+		   left:20%;
+		}
+		
+	   .header .box.three{
+          width:48%;
+          height:100%;
+		}
+		
+		
+		
+		 footer .content .raw{
+             display:flex;
+	         flex-wrap:wrap;
+	
+         }
+	
+		   footer .content .raw .col{
+		     width:100%;
+		   }
+		}
+		
+		#hamsoft{
+		  background-image:url(forward.jpg) 0 0;
+		}
+		
+		/*the two codes bellow provide scalability for the links on mobile devices*/
+		
+		.links{
+		  flex-wrap:wrap;
+		  
+		}
+		.links .col{
+		  float:left;
+		  width:100%;
+		}
+   }
+   
+   @media(max-width:810px){
+      .menu ul li{
+	      float:none;
+		  font-size:0.6em;
+		  color:green;
+	  }
+
+	  .menu{
+	    display:none; /*hiding the menu on small devices*/
+	  }
+	  
+	  #slidercontainer{
+	    width:30%;
+	  }
+	   .menu li .productdropdown{  
+	      left:80%;
+		  top:0;
+	   }
+	        /*styling the appearance of box two in the header on small screens*/
+	   .header .box.two{
+	     border:none;
+		 z-index:1;
+		 color:#14f550;
+	   }
+   }
+   
+
+ 
+  
+</style>
+</head>
+<body>
+    
+    <h2>sofery.net <span id="name">build better</span></h2>
+
+  <div class="header">
+
+     <div class="box one">
+        <img id="cover" src="{{url_for('static',filename='images/icon.webp')}}" alt="icon">
+     </div>
+	 
+	 
+	 
+	 <div id="slidercontainer">   <!---this div contains the scrolling images----->
+                 <figure>
+	               <img >
+	               <img src="{{url_for('static',filename='images/soilbricks.jpg')}}" alt="soilbricks"> 
+	               <img src="{{url_for('static',filename='images/designer.jpg')}}" alt="designer pavers">
+	               <img src="{{url_for('static',filename='images/yellowsand.jpeg')}}" alt="yellow lake sand">
+	               <img src="{{url_for('static',filename='images/claybricks.jpg')}}" alt="clay bricks">
+	             </figure>
+     </div> 
+    
+	 
+	 
+	 
+   
+     <div class="box two">
+         
+	    <div class="contact">
+	      <p id="phones"><span id="orderid" style="color:rgb(0,0,225)">order now</span>&nbsp; get quick delivery</p>
+        </div>
+	 </div>
+	 
+	 
+	 
+	   
+	   <div class="box three">
+	   
+	      <div class="slide one">
+		  
+		    <div class="moveit">
+	         <img src="{{ url_for('static',filename='images/018.jpg') }}" alt="kidukundu plaster sand">
+			</div>
+			
+	      </div>
+	
+	      <div class="slide two">
+		  
+		    <div class="moveit">
+	         <img src="{{ url_for('static',filename='images/esb.jpg') }}" alt="">
+			</div>
+			
+	      </div>
+	
+	      <div class="slide three">
+		  
+		    <div class="moveit">
+	         <img src="{{ url_for('static',filename='images/08.jpg') }}" alt="">
+			</div>
+			
+	      </div>
+	
+	      <div class="slide four">
+		  
+		    <div class="moveit">
+	         <div class="thiso"><img src="{{ url_for('static',filename='images/08.jpg') }}" alt=""></div>
+			</div>
+			
+	      </div>
+		  
+	   </div>
+	   
+  </div>
+  
+  <!--menue 2---->
+  
+  
+   <div class="menu-container">
+            <div class="menu-bar">
+                <div class="menu-item active">
+                    <h2>your supplire</h2>
+                    <p>Find supplier near you</p>
+                </div>
+                <div class="menu-item">
+                    <h2>Order Online</h2>
+                    <p>use your phone to buy materials</p>
+                </div>
+                <div class="menu-item">
+                  <a href="{{url_for('dealspage')}}">
+                    <h2>Hot Deals</h2>
+                    <p>Make Money Here</p>
+                  </a>
+                </div>
+            </div>
+        </div>
+  
+  
+  
+  
+  <!--introducing the search bar-->
+
+<input  type="text" id="myInput" onkeyup="myFunction()" placeholder="Select District to see supplires near you.." title="Type in a name" >
+
+<ul id="myUL">
+  <li><a href="{{url_for('kampaladistrict')}}">kampala District</a></li>
+  <li><a href="{{url_for('wakisodistricttowns')}}">wakiso District</a></li>
+
+</ul>
+
+<!--javascript for the search bar-->
+
+<script>
+function myFunction() {
+    var input, filter, ul, li, a, i, txtValue;
+    input = document.getElementById("myInput");
+    filter = input.value.toUpperCase();
+    ul = document.getElementById("myUL");
+    li = ul.getElementsByTagName("li");
+    for (i = 0; i < li.length; i++) {
+        a = li[i].getElementsByTagName("a")[0];
+        txtValue = a.textContent || a.innerText;
+        if (txtValue.toUpperCase().indexOf(filter) > -1) {
+            li[i].style.display = "";
+        } else {
+            li[i].style.display = "none";
+        }
+    }
+}
+</script>
+  

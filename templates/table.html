@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Deals Table</title>
+</head>
+<body>
+
+<h2>All Deals (with image file names)</h2>
+
+<table border="1" cellpadding="10">
+<tr>
+    <th>Supplier</th>
+    <th>Material</th>
+    <th>Tipper</th>
+    <th>Location</th>
+    <th>Phone</th>
+    <th>Image1</th>
+    <th>Image2</th>
+</tr>
+
+{% for row in data %}
+<tr>
+    <td>{{row.suppliername}}</td>
+    <td>{{row.materialname}}</td>
+    <td>{{row.tippername}}</td>
+    <td>{{row.location}}</td>
+    <td>{{row.phone}}</td>
+    <td>{{row.imageone}}</td>
+    <td>{{row.imagetwo}}</td>
+</tr>
+{% endfor %}
+
+</table>
+
+<br>
+<a href="/images">View Real Images</a>
+
+</body>
+</html>

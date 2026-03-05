@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Available Deals on Wheels</title>
+    <!-- Link to the CSS file (adjust path if needed) -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='dealstoadminstyle.css') }}">
+    <!-- Font Awesome for icons (optional but recommended) -->
+</head>
+<body>
+
+
+    <div class="container">
+        <h2 class="text-center mb-4">🔥 Available Deals on Wheels</h2>
+
+        <div class="row">
+            {% for row in data %}
+            <div class="col">
+                <div class="card">
+                    <!-- Optional: Add a badge for new or hot deals -->
+                    {% if loop.first %}
+                    <div class="badge badge-primary" style="position: absolute; top: 10px; right: 10px;">HOT</div>
+                    {% endif %}
+                    
+                    <div class="card-header">
+                        <h3>{{ row.materialname }}</h3>
+                    </div>
+
+                    <div class="card-body">
+                        <p><i class="fas fa-user"></i> <strong>Supplier:</strong> {{ row.suppliername }}</p>
+                        <p><i class="fas fa-truck"></i> <strong>Tipper:</strong> {{ row.tippername }}</p>
+                        <p><i class="fas fa-map-marker-alt"></i> <strong>Location:</strong> {{ row.location }}</p>
+                        
+                        <!-- Phone number with click-to-call -->
+                        <p>
+                            <i class="fas fa-phone-alt"></i> <strong>Phone:</strong> 
+                            <a href="tel:+256703446623" class="phone-link">{{ row.phone }}</a>
+                        </p>
+
+                        <!-- Image gallery -->
+                        <div class="image-gallery">
+                            {% if row.imageone %}
+                            <img src="{{ url_for('static', filename='uploads/' + row.imageone) }}" 
+                                 alt="Deal image 1" 
+                                 class="deal-image"
+                                 onclick="openModal(this.src)">
+                            {% endif %}
+                            
+                            {% if row.imagetwo %}
+                            <img src="{{ url_for('static', filename='uploads/' + row.imagetwo) }}" 
+                                 alt="Deal image 2" 
+                                 class="deal-image"
+                                 onclick="openModal(this.src)">
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="card-footer flex-between">
+                        <span class="price-tag">Call for price</span>
+                        <a href="tel:+256703446623" class="btn btn-primary btn-small">
+                            <i class="fas fa-phone-alt"></i> Call Now
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Image Modal (for enlarging images) -->
+    <div id="imageModal" class="modal-overlay" style="display: none;" onclick="closeModal()">
+        <div class="modal" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <h3>Deal Image</h3>
+                <span class="close-modal" onclick="closeModal()">&times;</span>
+            </div>
+            <div class="modal-body text-center">
+                <img id="modalImage" src="" alt="Enlarged view" style="max-width: 100%; max-height: 70vh;">
+            </div>
+        </div>
+    </div>
+
+    <!-- Include the JavaScript file -->
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <script>
+        // Simple modal functions (can also be placed in script.js)
+        function openModal(src) {
+            document.getElementById('modalImage').src = src;
+            document.getElementById('imageModal').style.display = 'flex';
+        }
+        function closeModal() {
+            document.getElementById('imageModal').style.display = 'none';
+        }
+    </script>
+</body>
+</html>

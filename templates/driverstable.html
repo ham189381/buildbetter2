@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Drivers List</title>
+</head>
+<body>
+    <h2>Registered Drivers</h2>
+
+    {% if drivers %}
+    <table border="1" cellpadding="8">
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>District</th>
+            <th>Division</th>
+            <th>Town</th>
+            <th>Phone</th>
+            <th>truck_name</th>
+            <th>image1</th>
+            <th>image2</th>
+            <th>image3</th>
+        </tr>
+
+        {% for driver in drivers %}
+        <tr>
+            <td>{{ driver[0] }}</td>
+            <td>{{ driver[1] }}</td>
+            <td>{{ driver[2] }}</td>
+            <td>{{ driver[3] }}</td>
+            <td>{{ driver[4] }}</td>
+            <td>{{ driver[5] }}</td>
+            <td>{{ driver[6] }}</td>
+            <td>{{ driver[7] }}</td>
+            <td>{{ driver[8] }}</td>
+            <td>{{ driver[9] }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% else %}
+        <p>No drivers found.</p>
+    {% endif %}
+</body>
+</html>

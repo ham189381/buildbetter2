@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <title>drivers</title>
+    <style>
+
+
+        .container{
+            width:100%;
+            display:flex;
+            justify-content:center;
+            align-items:center;
+        }
+
+        .container .col{
+            width:50%;
+            height:100%;
+            border:1px solid lightgoldenrodyellow;
+            
+        }
+
+         .container .col.two{
+           background-color: rgb(145, 248, 184);
+         }
+
+         .driver_details h1{
+           color:lawngreen;
+         }
+    </style>
+</head>
+<body>
+
+<div class="container"> <!--opening container-->>
+
+<div class="col one"><!--openning colone-->>
+
+ <div class="driver_details">
+
+    <h1>you have been registered as:</h1>
+ {% for driver in drivers %}
+            <h2>{{ driver[0] }}</h2>
+            <h2>{{ driver[1] }}</h2>
+            <h2>{{ driver[2] }}</h2>
+            <h2>{{ driver[3] }}</h2>
+            <h2>{{ driver[4] }}</h2>
+            <h2>{{ driver[5] }}</h2>
+    {% endfor %}
+
+    <a href="{{url_for('form')}}">upload photos</a>
+
+ </div>
+
+ <div class="driver_images">
+
+  <img id="one" src="{{url_for('static',filename='images/014.jpg')}} alt=ten tires" alt="">
+  <img id="two" src="" alt="">
+  <img id="three" src="" alt="">
+
+ </div>
+
+</div> <!--clossing colone-->>
+
+
+<div class="col two"><!--openning col two-->
+
+ <h1>ADVERTISE HERE</h1>
+
+ <div class="driver_details">
+
+   
+
+ </div>
+
+ <div class="driver_images">
+
+  
+
+ </div>
+
+</div> <!--clossing col two-->>
+
+
+<!--clossing container-->>
+
+</body>
+</html>

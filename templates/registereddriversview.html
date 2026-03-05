@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Deals Table</title>
+</head>
+<body>
+
+<h2>All Deals (with image file names)</h2>
+
+<table border="1" cellpadding="10">
+<tr>
+    <th>name</th>
+    <th>district</th>
+    <th>division</th>
+    <th>town</th>
+    <th>phone</th>
+    <th>truck_name</th>
+    <th>filename1</th>
+    <th>filename2</th>
+    <th>filename3</th>
+</tr>
+
+{% for row in data %}
+<tr>
+    <td>{{row.name}}</td>
+    <td>{{row.district}}</td>
+    <td>{{row.division}}</td>
+    <td>{{row.town}}</td>
+    <td>{{row.phone}}</td>
+    <td>{{row.truck_name}}</td>
+    <td>{{row.image1}}</td>
+    <td>{{row.image2}}</td>
+    <td>{{row.image3}}</td>
+</tr>
+{% endfor %}
+
+</table>
+
+<br>
+<a href="/images">View Real Images</a>
+
+</body>
+</html>

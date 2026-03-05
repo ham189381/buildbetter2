@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>available deals on wheels</title>
+</head>
+<body>
+
+<h2>AVAILABLE DEALS TO BUY </h2>
+
+{% for row in data %}
+<div style="border:1px solid gray;margin:20px;padding:10px;">
+    <b>Material:</b> {{row.materialname}} <br>
+    <b>tipper:</b> {{row.tippername}} <br>
+    <b>Location:</b> {{row.location}} <br>
+    
+
+    <img src="{{ url_for('static', filename='uploads/' + row.imageone) }}" width="200">
+    <img src="{{ url_for('static', filename='uploads/' + row.imagetwo) }}" width="200">
+</div>
+{% endfor %}
+
+</body>
+</html>

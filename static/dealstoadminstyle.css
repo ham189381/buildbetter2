@@ -1,0 +1,77 @@
+/* Deals page specific styles */
+.phone-link {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 600;
+    transition: var(--transition);
+}
+
+.phone-link:hover {
+    color: var(--secondary-color);
+    text-decoration: underline;
+}
+
+.image-gallery {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.deal-image {
+    width: 100%;
+    max-width: 200px;
+    height: 150px;
+    object-fit: cover;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    transition: var(--transition);
+    border: 2px solid transparent;
+}
+
+.deal-image:hover {
+    transform: scale(1.05);
+    border-color: var(--primary-color);
+    box-shadow: var(--box-shadow);
+}
+
+.price-tag {
+    background: var(--success-color);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+/* Make cards equal height */
+.row {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.col {
+    display: flex;
+}
+
+.card {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.card-body {
+    flex: 1;
+}
+
+/* Responsive adjustments */
+@media screen and (max-width: 768px) {
+    .deal-image {
+        max-width: 100%;
+        height: auto;
+    }
+    
+    .image-gallery {
+        flex-direction: column;
+    }
+}
