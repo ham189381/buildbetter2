@@ -3,6 +3,7 @@ from twilio.twiml.messaging_response import MessagingResponse
 from werkzeug.utils import secure_filename
 import psycopg2
 import os
+from urllib.parse import urlparse
 
 app = Flask(__name__)
 
@@ -18,13 +19,19 @@ app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 # -------------------------
 def get_db_connection():
     """Return a PostgreSQL connection.
-       Prefer using DATABASE_URL environment variable (e.g., on Render),
-       otherwise fall back to hardcoded local credentials."""
+       For production (Render), use DATABASE_URL with SSL.
+       For local development, fallback to hardcoded credentials."""
     database_url = os.environ.get("DATABASE_URL")
     if database_url:
+        # Ensure SSL mode is required (Render enforces this for external connections)
+        # Some DATABASE_URLs already include ?sslmode=require, but we add if missing.
+        if "sslmode" not in database_url:
+            # Append the parameter. Handle existing query string.
+            separator = "&" if "?" in database_url else "?"
+            database_url += f"{separator}sslmode=require"
         return psycopg2.connect(database_url)
     else:
-        # Local development credentials
+        # Local development credentials – adjust as needed
         return psycopg2.connect(
             host="127.0.0.1",
             database="drivers_db",
@@ -82,7 +89,7 @@ create_drivers_table()
 create_deals_table()
 
 # -------------------------
-# Routes
+# Routes (unchanged)
 # -------------------------
 @app.route("/")
 def home():
@@ -131,7 +138,7 @@ def show_drivers_by_town(town):
     drivers = get_drivers_by_town(town)
     return render_template("spacifictowndrivers.html", drivers=drivers, town=town)
 
-# Static pages
+# Static pages (unchanged)
 @app.route('/kampaladistrict')
 def kampaladistrict():
     return render_template('kampaladivisions.html')
@@ -377,4 +384,8 @@ def search_driversby():
 # Run the app
 # -------------------------
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    # Use environment variable PORT if present (Render sets it), otherwise default to 5000
+    port = int(os.environ.get("PORT", 5000))
+    # Disable debug mode when running on Render (i.e., when DATABASE_URL is set)
+    debug = os.environ.get("DATABASE_URL") is None
+    app.run(host="0.0.0.0", port=port, debug=debug)
