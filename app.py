@@ -1,144 +1,130 @@
-from flask import Flask, request, render_template, redirect, url_for
+from flask import Flask, request,render_template,redirect,url_for
 from twilio.twiml.messaging_response import MessagingResponse
 from werkzeug.utils import secure_filename
-import psycopg2
 import os
-from urllib.parse import urlparse
+import sqlite3
 
 app = Flask(__name__)
 
-# -------------------------
-# Configuration
-# -------------------------
+#---DATABASE SET UP ---this sets up the database ,it should 
+#be written exactly here and just on top of all the routes
+
+PROJECT_FOLDER = os.path.dirname(os.path.abspath(__file__))
+DATABASE_FILE = os.path.join(PROJECT_FOLDER, "Database.db")
+
+#this enables to upload images in a database 
+# ie images are stored as file name in static/uploads 
+
 UPLOAD_FOLDER = "static/uploads"
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)  # Create directory if it doesn't exist
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 
-# -------------------------
-# Database connection
-# -------------------------
-def get_db_connection():
-    """Return a PostgreSQL connection.
-       For production (Render), use DATABASE_URL with SSL.
-       For local development, fallback to hardcoded credentials."""
-    database_url = os.environ.get("DATABASE_URL")
-    if database_url:
-        # Ensure SSL mode is required (Render enforces this for external connections)
-        # Some DATABASE_URLs already include ?sslmode=require, but we add if missing.
-        if "sslmode" not in database_url:
-            # Append the parameter. Handle existing query string.
-            separator = "&" if "?" in database_url else "?"
-            database_url += f"{separator}sslmode=require"
-        return psycopg2.connect(database_url)
-    else:
-        # Local development credentials – adjust as needed
-        return psycopg2.connect(
-            host="127.0.0.1",
-            database="drivers_db",
-            user="postgres",
-            password="1234",
-            port="5432"
-        )
+def get_drivers_database():
+    return sqlite3.connect(DATABASE_FILE)
 
-# -------------------------
-# Helper to create tables
-# -------------------------
-def create_drivers_table():
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS drivers (
-            id SERIAL PRIMARY KEY,
-            name TEXT,
-            district TEXT,
-            division TEXT,
-            town TEXT,
-            phone TEXT,
-            truck_name TEXT,
-            image1 TEXT,
-            image2 TEXT,
-            image3 TEXT
-        )
-    """)
-    conn.commit()
-    cursor.close()
-    conn.close()
+#------ROUTES---------------
 
-def create_deals_table():
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS deals (
-            id SERIAL PRIMARY KEY,
-            suppliername TEXT,
-            materialname TEXT,
-            tippername TEXT,
-            location TEXT,
-            phone TEXT,
-            imageone TEXT,
-            imagetwo TEXT,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-    """)
-    conn.commit()
-    cursor.close()
-    conn.close()
-
-# Create tables when app starts
-create_drivers_table()
-create_deals_table()
-
-# -------------------------
-# Routes (unchanged)
-# -------------------------
 @app.route("/")
 def home():
-    return render_template("sofery.html")
+    return  render_template("sofery.html")
+
 
 @app.route('/prospect')
 def prospect():
-    return render_template('prospect.html')
+    return render_template('prospect.html') #prospect option form
 
 @app.route('/process', methods=['POST'])
 def process():
+    # Get the selected radio button value
     choice = request.form.get('option')
-    if choice in ['supplire', 'driver', 'both']:
-        return render_template("driverdetails.html")
+    
+    # Process the data
+    if choice == 'supplire':
+        message = "You selected am a supplire!"
+        
+    elif choice == 'driver':
+       return render_template("driverdetails.html")
+    
+    elif choice == 'both':
+        message = "You selected i do both!"
     else:
-        return '<h1>Result</h1><p>No option was selected.</p>'
+        message = "No option was selected."
+    
+    return f'<h1>Result</h1><p>{message}</p>'
+
+
+
+#function to connect to database
+
+def get_db_connection():
+    return sqlite3.connect("database.db")
+
+
+
+# handle form submision
+
+
+#route to show all registered drivers(drivers table)
 
 @app.route("/drivers")
 def view_drivers():
     conn = get_db_connection()
     cursor = conn.cursor()
+
     cursor.execute("SELECT * FROM drivers")
     drivers = cursor.fetchall()
-    cursor.close()
+
     conn.close()
+
     return render_template("driverstable.html", drivers=drivers)
 
+
+
+
+
+
+
+
+
+#registered drivers page
 @app.route("/showdrivers")
 def driverpage():
     return render_template("driver.html")
 
+#get drivers by town case insensitive
+
 def get_drivers_by_town(town):
-    conn = get_db_connection()
+    conn=get_drivers_database()
     cursor = conn.cursor()
     cursor.execute(
-        "SELECT * FROM drivers WHERE LOWER(town) LIKE LOWER(%s)",
+        "SELECT * FROM drivers WHERE LOWER(town) LIKE LOWER(?)",
         ('%' + town + '%',)
     )
+
     drivers = cursor.fetchall()
-    cursor.close()
     conn.close()
+
     return drivers
+
+get_drivers_by_town("town")
+
+#route that uses the above function to show 
+# drivers depending on town. 
+
+#NOTE:We are going to link to this function in the html 
+# page that contains towns and just chane 
+# the town names in order to display drivers
+# drivers database table in 
+# that particular town
 
 @app.route("/drivers/<town>")
 def show_drivers_by_town(town):
     drivers = get_drivers_by_town(town)
-    return render_template("spacifictowndrivers.html", drivers=drivers, town=town)
+    return render_template("spacifictowndrivers.html", drivers=drivers,town=town)
 
-# Static pages (unchanged)
+
+
+
 @app.route('/kampaladistrict')
 def kampaladistrict():
     return render_template('kampaladivisions.html')
@@ -171,95 +157,200 @@ def makindyedivision():
 def rubagadivision():
     return render_template('rubagadivisionparishes.html')
 
+
+#routes to links in the naviation bar
+
 @app.route("/supplirenearyou")
 def supplirenearyou():
     return render_template("supplirenearyou.html")
+
+#route that shows the page for drivers 
+# table by town 
 
 @app.route("/drivers_tables_by_town")
 def drivers_tables_by_town():
     return render_template("drivers_by_town_table.html")
 
+#routes to the different drivers in particular towns
+
 @app.route("/kampala_ntinda")
 def kampala_ntinda():
     return render_template("kampala_ntinda_supplires.html")
 
+
+
+
+
+
+
+
+#DRIVER UPLOAD APP SECTION
+
 # -------------------------
-# Driver Registration
+# CREATE TABLE drivers IF NOT EXISTS
 # -------------------------
+def createdriverstable():
+    conn = sqlite3.connect("database.db")
+    cursor = conn.cursor()
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS drivers (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT,
+    district TEXT,
+    division TEXT,
+    town TEXT,
+    phone NUMBER,
+    truck_name TEXT,
+    image1 TEXT,
+    image2 TEXT,
+    image3 TEXT                   
+    )
+    """)
+
+    conn.commit()
+    conn.close()
+
+createdriverstable()
+
+
+
+#-------------------------
+#DRIVERS REGISTRATION FORM PAGE
+#--------------------------
+
 @app.route("/driverdetails")
 def driverdetails():
     return render_template("driverdetails.html")
 
-@app.route("/driver", methods=["GET", "POST"])
+# -------------------------
+# SAVE DRIVER DATA
+# -------------------------
+
+
+@app.route("/driver",methods=["GET" ,"POST"])
 def driver():
-    if request.method == "POST":
-        name = request.form["name"]
-        district = request.form["district"]
-        division = request.form["division"]
-        town = request.form["town"]
-        phone = request.form["phone"]
-        truck_name = request.form["truck_name"]
+  
+    name=request.form["name"]
+    district=request.form["district"]
+    division=request.form["division"]
+    town=request.form["town"]
+    phone=request.form["phone"]
+    truck_name=request.form["truck_name"]
 
-        image1 = request.files["image1"]
-        image2 = request.files["image2"]
-        image3 = request.files["image3"]
+    image1=request.files["image1"]
+    image2=request.files["image2"]
+    image3=request.files["image3"]
 
-        filename1 = secure_filename(image1.filename) if image1 else ""
-        filename2 = secure_filename(image2.filename) if image2 else ""
-        filename3 = secure_filename(image3.filename) if image3 else ""
+    filename1 = ""
+    filename2 = ""
+    filename3 = ""
 
-        if filename1:
-            image1.save(os.path.join(app.config["UPLOAD_FOLDER"], filename1))
-        if filename2:
-            image2.save(os.path.join(app.config["UPLOAD_FOLDER"], filename2))
-        if filename3:
-            image3.save(os.path.join(app.config["UPLOAD_FOLDER"], filename3))
+    if image1:
+        filename1 = secure_filename(image1.filename)
+        image1.save(os.path.join(app.config["UPLOAD_FOLDER"], filename1))
+    
+    if image2:
+        filename2 = secure_filename(image2.filename)
+        image2.save(os.path.join(app.config["UPLOAD_FOLDER"], filename2))
 
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        cursor.execute("""
-            INSERT INTO drivers (name, district, division, town, phone, truck_name, image1, image2, image3)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
-        """, (name, district, division, town, phone, truck_name, filename1, filename2, filename3))
-        conn.commit()
-        cursor.close()
-        conn.close()
+    if image3:
+        filename3 = secure_filename(image3.filename)
+        image3.save(os.path.join(app.config["UPLOAD_FOLDER"], filename3))
 
-        return "Driver information saved successfully"
-    else:
-        return render_template("driverdetails.html")
-
-@app.route("/registereddrivers")
-def registereddrivers():
-    conn = get_db_connection()
+    #insert into database
+    conn = sqlite3.connect("database.db")
     cursor = conn.cursor()
+
+    cursor.execute("""
+        INSERT INTO drivers (name,district,division,town,phone,truck_name,image1,image2,image3)
+        VALUES (?,?,?,?,?,?,?,?,?)
+    """, (name,district,division,town,phone,truck_name,filename1,filename2,filename3))
+
+    conn.commit()
+    conn.close()
+
+    return "driver informationsaved successfully"
+
+
+
+# -------------------------
+#ADMIN ROUTE THAT SHOWS ALL THE REGISTERED DRIVERS
+#  TABBLE WITH IMAGES FILE NAMES
+# -------------------------
+@app.route("/registereddrivers")
+def registereddrivers ():
+    conn = sqlite3.connect("database.db")
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+
     cursor.execute("SELECT * FROM drivers")
-    rows = cursor.fetchall()
-    columns = [desc[0] for desc in cursor.description]
-    data = [dict(zip(columns, row)) for row in rows]
-    cursor.close()
+    data = cursor.fetchall()
+
     conn.close()
     return render_template("registereddriversview.html", data=data)
 
+# -------------------------
+
+
+# -------------------------
+#ADMIN ROUTE THAT SHOWS ALL DETAILS OF DRIVERS WITH IMAGES
+# -------------------------
 @app.route("/alldrivers")
 def alldrivers():
-    conn = get_db_connection()
+    conn = sqlite3.connect("database.db")
+    conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
+
     cursor.execute("SELECT * FROM drivers")
-    rows = cursor.fetchall()
-    columns = [desc[0] for desc in cursor.description]
-    data = [dict(zip(columns, row)) for row in rows]
-    cursor.close()
+    data = cursor.fetchall()
+
     conn.close()
     return render_template("alldriversview.html", data=data)
 
 # -------------------------
-# Deals Section
+
+
+
+
+
+#HOT DEALS APP SECTION
+
+# -------------------------
+# CREATE TABLE deals IF NOT EXISTS
+# -------------------------
+def create_table():
+    conn = sqlite3.connect("database.db")
+    cursor = conn.cursor()
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS deals (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        suppliername TEXT,
+        materialname TEXT,
+        tippername TEXT,
+        location TEXT,
+        phone TEXT,
+        imageone TEXT,
+        imagetwo TEXT
+    )
+    """)
+
+    conn.commit()
+    conn.close()
+
+create_table()
+
+# -------------------------
+# FORM PAGE
 # -------------------------
 @app.route("/deals")
 def deals():
     return render_template("dealsform.html")
 
+# -------------------------
+# SAVE DATA
+# -------------------------
 @app.route("/save", methods=["POST"])
 def save():
     suppliername = request.form["suppliername"]
@@ -271,75 +362,101 @@ def save():
     image1 = request.files["imageone"]
     image2 = request.files["image2"]
 
-    filename1 = secure_filename(image1.filename) if image1 else ""
-    filename2 = secure_filename(image2.filename) if image2 else ""
+    filename1 = ""
+    filename2 = ""
 
-    if filename1:
+    if image1:
+        filename1 = secure_filename(image1.filename)
         image1.save(os.path.join(app.config["UPLOAD_FOLDER"], filename1))
-    if filename2:
+
+    if image2:
+        filename2 = secure_filename(image2.filename)
         image2.save(os.path.join(app.config["UPLOAD_FOLDER"], filename2))
 
-    conn = get_db_connection()
+    conn = sqlite3.connect("database.db")
     cursor = conn.cursor()
+
     cursor.execute("""
-        INSERT INTO deals (suppliername, materialname, tippername, location, phone, imageone, imagetwo)
-        VALUES (%s, %s, %s, %s, %s, %s, %s)
+    INSERT INTO deals 
+    (suppliername, materialname, tippername, location, phone, imageone, imagetwo)
+    VALUES (?, ?, ?, ?, ?, ?, ?)
     """, (suppliername, materialname, tippername, location, phone, filename1, filename2))
+
     conn.commit()
-    cursor.close()
     conn.close()
 
-    return "Your deal has been uploaded successfully"
+    return "your deal has been uploaded successfully"
 
+# -------------------------
+# SHOW TABLE WITH FILENAMES
+# -------------------------
 @app.route("/table")
 def table():
-    conn = get_db_connection()
+    conn = sqlite3.connect("database.db")
+    conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
+
     cursor.execute("SELECT * FROM deals")
-    rows = cursor.fetchall()
-    columns = [desc[0] for desc in cursor.description]
-    data = [dict(zip(columns, row)) for row in rows]
-    cursor.close()
+    data = cursor.fetchall()
+
     conn.close()
     return render_template("table.html", data=data)
 
+# -------------------------
+#CUSTOMER ROUTE THAT RETURNS REGISTERED DEALS
+#EXCLUDING DRIVER NAME AND PHONE 
+# -------------------------
 @app.route("/dealstocustomer")
 def dealstocustomer():
-    conn = get_db_connection()
+    conn = sqlite3.connect("database.db")
+    conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
+
     cursor.execute("SELECT * FROM deals")
-    rows = cursor.fetchall()
-    columns = [desc[0] for desc in cursor.description]
-    data = [dict(zip(columns, row)) for row in rows]
-    cursor.close()
+    data = cursor.fetchall()
+
     conn.close()
     return render_template("customerdealsview.html", data=data)
 
+# -------------------------
+
+
+# -------------------------
+#ADMIN ROUTE THAT SHOWS ALL THE DETAILS IN REGISTERED DEALS
+# -------------------------
 @app.route("/dealstoadmin")
 def dealstoadmin():
-    conn = get_db_connection()
+    conn = sqlite3.connect("database.db")
+    conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
+
     cursor.execute("SELECT * FROM deals")
-    rows = cursor.fetchall()
-    columns = [desc[0] for desc in cursor.description]
-    data = [dict(zip(columns, row)) for row in rows]
-    cursor.close()
+    data = cursor.fetchall()
+
     conn.close()
     return render_template("admindealsview.html", data=data)
 
+# -------------------------
+
+#route that provides a link to the deals second page
 @app.route("/dealspage")
 def dealspage():
     return render_template("dealspage.html")
 
-# -------------------------
-# WhatsApp Webhook
-# -------------------------
+
+
+
+
 @app.route('/whatsapp', methods=['POST'])
 def whatsapp_reply():
+    # Get the incoming message from the user
     incoming_msg = request.values.get('Body', '').lower()
+    
+    # Create a Twilio response object
     resp = MessagingResponse()
     msg = resp.message()
-
+    
+    # Simple response logic
     if 'hello' in incoming_msg:
         msg.body("Hi there! 👋 send us your shopping items?")
     elif 'how are you' in incoming_msg:
@@ -348,44 +465,10 @@ def whatsapp_reply():
         msg.body("Goodbye! Have a wonderful day! 👋")
     else:
         msg.body("Thanks for your message! I'm a simple bot. Try saying 'hello', 'how are you', or 'bye'.")
-
+    
     return str(resp)
 
-# -------------------------
-# Search drivers by district & town
-# -------------------------
-@app.route("/searchdriverbydt")
-def searchdriverbydt():
-    return render_template("search_driver_by.html")
 
-@app.route('/search_driversby', methods=['GET', 'POST'])
-def search_driversby():
-    district = request.form['district'].strip()
-    town = request.form['town'].strip()
 
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    cursor.execute("""
-        SELECT * FROM drivers
-        WHERE LOWER(district) = LOWER(%s)
-        AND LOWER(town) = LOWER(%s)
-    """, (district, town))
-
-    rows = cursor.fetchall()
-    columns = [desc[0] for desc in cursor.description]
-    drivers = [dict(zip(columns, row)) for row in rows]
-
-    cursor.close()
-    conn.close()
-
-    return render_template("drivers_results.html", drivers=drivers)
-
-# -------------------------
-# Run the app
-# -------------------------
 if __name__ == "__main__":
-    # Use environment variable PORT if present (Render sets it), otherwise default to 5000
-    port = int(os.environ.get("PORT", 5000))
-    # Disable debug mode when running on Render (i.e., when DATABASE_URL is set)
-    debug = os.environ.get("DATABASE_URL") is None
-    app.run(host="0.0.0.0", port=port, debug=debug)
+    app.run(host="0.0.0.0",port=5000, debug=True)
