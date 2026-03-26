@@ -1,27 +1,51 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>material supplire registration form</title>
+    <title>material supplires registration form</title>
+    <style>
+        body{
+            box-sizing:border-box;
+            justify-content:center;
+            align-items:center;
+        }
+        .sofery{
+            width:50%;
+            border:1px solid green;
+            padding:1em;
+            background-color:#7FFF00;
+        }
+        .sofery .two{
+            font-size:2em;
+            color:red;
+        }
+    </style>
 </head>
 <body>
     <h1>Choose an option:</h1>
+
+    <div class="sofery">
+
     <form action="/process" method="POST" >
-        <label>
+
+        <label class="one">
             <input type="radio" name="option" value="supplire">
             
         </label><br>
         
-        <label>
+        <label class="two">
             <input type="radio" name="option" value="driver">
             Become a supplire
         </label><br>
         
-        <label>
+        <label class="three">
             <input type="radio" name="option" value="both">
             
         </label><br><br>
         
         <input type="submit" value="Submit">
     </form>
+
+</div>
+
 </body>
 </html>

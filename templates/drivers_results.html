@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<style>
+
+body{
+font-family: Arial;
+background-color:#dddada;
+}
+
+.driver-container{
+width:90%;
+margin:auto;
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+gap:20px;
+}
+
+.driver-table{
+width:100%;
+color:white;
+border-radius:10px;
+overflow:hidden;
+background-size:cover;
+background-position:center;
+
+}
+
+.driver-table img{
+   position:relative;
+   z-index:-1 ;
+}
+
+
+.driver-table table{
+width:100%;
+background:rgba(0,0,0,0.6);
+padding:15px;
+position:absolute;
+z-index:;
+}
+
+
+
+.driver-table td{
+padding:8px;
+}
+
+.call-btn{
+background:green;
+color:white;
+padding:8px 15px;
+text-decoration:none;
+border-radius:5px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h2 style="text-align:center;">Available Drivers</h2>
+
+<div class="driver-container">
+
+{% for driver in drivers %}
+
+<div class="driver-table">
+<img src="{{ url_for('static', filename='uploads/' + (driver['image1'] or 'default.jpg')) }}">
+<table>
+
+
+<tr>
+<td><b>Name</b></td>
+<td>{{ driver['name'] }}</td>
+</tr>
+
+<tr>
+<td><b>Truck</b></td>
+<td>{{ driver['truck_name'] }}</td>
+</tr>
+
+<tr>
+<td><b>District</b></td>
+<td>{{ driver['district'] }}</td>
+</tr>
+
+<tr>
+<td><b>Town</b></td>
+<td>{{ driver['town'] }}</td>
+</tr>
+
+<tr>
+<td><b>Phone</b></td>
+<td>
+<a href="tel:{{ driver['phone'] }}" class="call-btn">Call</a>
+</td>
+</tr>
+
+</table>
+
+</div>
+
+{% endfor %}
+
+</div>
+
+</body>
+</html>
