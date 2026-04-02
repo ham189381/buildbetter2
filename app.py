@@ -4,15 +4,25 @@ from werkzeug.utils import secure_filename
 import psycopg2
 import os
 from urllib.parse import urlparse
+import cloudinary
+import cloudinary.uploader
+import cloudinary.api
 
 app = Flask(__name__)
 
 # -------------------------
+# Cloudinary Configuration
+# -------------------------
+cloudinary.config(
+    cloud_name=os.environ.get("df8mj7a7d"),
+    api_key=os.environ.get("472983627877217"),
+    api_secret=os.environ.get("qU0fIsZHNVxO36UCTvaGSKXVjno")
+)
+
+# -------------------------
 # Configuration
 # -------------------------
-UPLOAD_FOLDER = "static/uploads"
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
+# No local upload folder needed; we'll use Cloudinary directly.
 
 # -------------------------
 # Database connection
@@ -24,9 +34,7 @@ def get_db_connection():
     database_url = os.environ.get("DATABASE_URL")
     if database_url:
         # Ensure SSL mode is required (Render enforces this for external connections)
-        # Some DATABASE_URLs already include ?sslmode=require, but we add if missing.
         if "sslmode" not in database_url:
-            # Append the parameter. Handle existing query string.
             separator = "&" if "?" in database_url else "?"
             database_url += f"{separator}sslmode=require"
         return psycopg2.connect(database_url)
@@ -200,27 +208,32 @@ def driver():
         phone = request.form["phone"]
         truck_name = request.form["truck_name"]
 
-        image1 = request.files["image1"]
-        image2 = request.files["image2"]
-        image3 = request.files["image3"]
+        image1 = request.files.get("image1")
+        image2 = request.files.get("image2")
+        image3 = request.files.get("image3")
 
-        filename1 = secure_filename(image1.filename) if image1 else ""
-        filename2 = secure_filename(image2.filename) if image2 else ""
-        filename3 = secure_filename(image3.filename) if image3 else ""
+        # Upload each image to Cloudinary if present
+        url1 = ""
+        if image1 and image1.filename:
+            upload_result = cloudinary.uploader.upload(image1)
+            url1 = upload_result.get("secure_url")
 
-        if filename1:
-            image1.save(os.path.join(app.config["UPLOAD_FOLDER"], filename1))
-        if filename2:
-            image2.save(os.path.join(app.config["UPLOAD_FOLDER"], filename2))
-        if filename3:
-            image3.save(os.path.join(app.config["UPLOAD_FOLDER"], filename3))
+        url2 = ""
+        if image2 and image2.filename:
+            upload_result = cloudinary.uploader.upload(image2)
+            url2 = upload_result.get("secure_url")
+
+        url3 = ""
+        if image3 and image3.filename:
+            upload_result = cloudinary.uploader.upload(image3)
+            url3 = upload_result.get("secure_url")
 
         conn = get_db_connection()
         cursor = conn.cursor()
         cursor.execute("""
             INSERT INTO drivers (name, district, division, town, phone, truck_name, image1, image2, image3)
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
-        """, (name, district, division, town, phone, truck_name, filename1, filename2, filename3))
+        """, (name, district, division, town, phone, truck_name, url1, url2, url3))
         conn.commit()
         cursor.close()
         conn.close()
@@ -268,23 +281,26 @@ def save():
     location = request.form["location"]
     phone = request.form["phone"]
 
-    image1 = request.files["imageone"]
-    image2 = request.files["image2"]
+    image1 = request.files.get("imageone")
+    image2 = request.files.get("image2")
 
-    filename1 = secure_filename(image1.filename) if image1 else ""
-    filename2 = secure_filename(image2.filename) if image2 else ""
+    # Upload each image to Cloudinary if present
+    url1 = ""
+    if image1 and image1.filename:
+        upload_result = cloudinary.uploader.upload(image1)
+        url1 = upload_result.get("secure_url")
 
-    if filename1:
-        image1.save(os.path.join(app.config["UPLOAD_FOLDER"], filename1))
-    if filename2:
-        image2.save(os.path.join(app.config["UPLOAD_FOLDER"], filename2))
+    url2 = ""
+    if image2 and image2.filename:
+        upload_result = cloudinary.uploader.upload(image2)
+        url2 = upload_result.get("secure_url")
 
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute("""
         INSERT INTO deals (suppliername, materialname, tippername, location, phone, imageone, imagetwo)
         VALUES (%s, %s, %s, %s, %s, %s, %s)
-    """, (suppliername, materialname, tippername, location, phone, filename1, filename2))
+    """, (suppliername, materialname, tippername, location, phone, url1, url2))
     conn.commit()
     cursor.close()
     conn.close()
@@ -384,8 +400,6 @@ def search_driversby():
 # Run the app
 # -------------------------
 if __name__ == "__main__":
-    # Use environment variable PORT if present (Render sets it), otherwise default to 5000
     port = int(os.environ.get("PORT", 5000))
-    # Disable debug mode when running on Render (i.e., when DATABASE_URL is set)
     debug = os.environ.get("DATABASE_URL") is None
     app.run(host="0.0.0.0", port=port, debug=debug)
