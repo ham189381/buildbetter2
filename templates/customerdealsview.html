@@ -1,21 +1,30 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>available deals on wheels</title>
+    <title>Available Deals on Wheels</title>
 </head>
 <body>
 
-<h2>AVAILABLE DEALS TO BUY </h2>
+<h2>AVAILABLE DEALS TO BUY</h2>
 
 {% for row in data %}
-<div style="border:1px solid gray;margin:20px;padding:10px;">
-    <b>Material:</b> {{row.materialname}} <br>
-    <b>tipper:</b> {{row.tippername}} <br>
-    <b>Location:</b> {{row.location}} <br>
-    
+<div style="border:1px solid gray; margin:20px; padding:10px;">
+    <b>Material:</b> {{ row.materialname }}<br>
+    <b>Tipper:</b> {{ row.tippername }}<br>
+    <b>Location:</b> {{ row.location }}<br>
 
-    <img src="{{ url_for('static', filename='uploads/' + row.imageone) }}" width="200">
-    <img src="{{ url_for('static', filename='uploads/' + row.imagetwo) }}" width="200">
+    <!-- Use Cloudinary URL directly from database -->
+    {% if row.imageone %}
+        <img src="{{ row.imageone }}" width="200" alt="Deal image 1">
+    {% else %}
+        <p>No image 1</p>
+    {% endif %}
+
+    {% if row.imagetwo %}
+        <img src="{{ row.imagetwo }}" width="200" alt="Deal image 2">
+    {% else %}
+        <p>No image 2</p>
+    {% endif %}
 </div>
 {% endfor %}
 
