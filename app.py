@@ -432,6 +432,85 @@ def view_orders():
     conn.close()
     return render_template("view_orders.html", orders=orders)
 
+#ROUTES TO DELETE AND EDIT ORDERS
+
+# Edit order - show form
+@app.route("/edit_order/<int:order_id>")
+def edit_order_form(order_id):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM orders WHERE id = %s", (order_id,))
+    row = cursor.fetchone()
+    cursor.close()
+    conn.close()
+    if not row:
+        return "Order not found", 404
+    columns = [desc[0] for desc in cursor.description] if cursor.description else []
+    # Re-fetch with columns after getting row (better to use dict cursor)
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM orders WHERE id = %s", (order_id,))
+    row = cursor.fetchone()
+    columns = [desc[0] for desc in cursor.description]
+    order = dict(zip(columns, row))
+    cursor.close()
+    conn.close()
+    return render_template("edit_order.html", order=order)
+
+# Update order - handle POST
+@app.route("/update_order/<int:order_id>", methods=["POST"])
+def update_order(order_id):
+    name = request.form["name"]
+    district = request.form["district"]
+    town = request.form["town"]
+    truck_name = request.form["truck_name"]
+    material_service = request.form["material_service"]
+    location = request.form["location"]
+    phone = request.form["phone"]
+
+    # Handle image updates: if new files uploaded, replace; otherwise keep old ones
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT image1, image2 FROM orders WHERE id = %s", (order_id,))
+    old_images = cursor.fetchone()
+    cursor.close()
+
+    image1 = request.files.get("image1")
+    image2 = request.files.get("image2")
+
+    url1 = old_images[0] if old_images else ""
+    if image1 and image1.filename:
+        upload_result = cloudinary.uploader.upload(image1)
+        url1 = upload_result.get("secure_url")
+
+    url2 = old_images[1] if old_images else ""
+    if image2 and image2.filename:
+        upload_result = cloudinary.uploader.upload(image2)
+        url2 = upload_result.get("secure_url")
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("""
+        UPDATE orders
+        SET name=%s, district=%s, town=%s, truck_name=%s, material_service=%s, location=%s, phone=%s, image1=%s, image2=%s
+        WHERE id=%s
+    """, (name, district, town, truck_name, material_service, location, phone, url1, url2, order_id))
+    conn.commit()
+    cursor.close()
+    conn.close()
+    return redirect(url_for('view_orders'))
+
+# Delete order
+@app.route("/delete_order/<int:order_id>")
+def delete_order(order_id):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM orders WHERE id = %s", (order_id,))
+    conn.commit()
+    cursor.close()
+    conn.close()
+    return redirect(url_for('view_orders'))
+
 
 
 
