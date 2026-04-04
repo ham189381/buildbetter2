@@ -92,9 +92,40 @@ def create_deals_table():
     cursor.close()
     conn.close()
 
+#CREATE ORDERS TABLE
+
+def create_orders_table():
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS orders (
+            id SERIAL PRIMARY KEY,
+            name TEXT,
+            district TEXT,
+            town TEXT,
+            truck_name TEXT,
+            material_service TEXT,
+            location TEXT,
+            phone TEXT,
+            image1 TEXT,
+            image2 TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
+    conn.commit()
+    cursor.close()
+    conn.close()
+
+
 # Create tables when app starts
 create_drivers_table()
 create_deals_table()
+create_orders_table()
+
+
+
+
+
 
 # -------------------------
 # Routes (unchanged)
@@ -346,6 +377,63 @@ def dealstoadmin():
 @app.route("/dealspage")
 def dealspage():
     return render_template("dealspage.html")
+
+
+#ROUTES FOR OREDERS TABLE
+
+@app.route("/order")
+def order_form():
+    return render_template("order_form.html")
+
+@app.route("/submit_order", methods=["POST"])
+def submit_order():
+    name = request.form["name"]
+    district = request.form["district"]
+    town = request.form["town"]
+    truck_name = request.form["truck_name"]
+    material_service = request.form["material_service"]
+    location = request.form["location"]
+    phone = request.form["phone"]
+
+    image1 = request.files.get("image1")
+    image2 = request.files.get("image2")
+
+    url1 = ""
+    if image1 and image1.filename:
+        upload_result = cloudinary.uploader.upload(image1)
+        url1 = upload_result.get("secure_url")
+
+    url2 = ""
+    if image2 and image2.filename:
+        upload_result = cloudinary.uploader.upload(image2)
+        url2 = upload_result.get("secure_url")
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("""
+        INSERT INTO orders (name, district, town, truck_name, material_service, location, phone, image1, image2)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+    """, (name, district, town, truck_name, material_service, location, phone, url1, url2))
+    conn.commit()
+    cursor.close()
+    conn.close()
+
+    return "Your order has been placed successfully! We will contact you soon."
+
+@app.route("/view_orders")
+def view_orders():
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM orders ORDER BY created_at DESC")
+    rows = cursor.fetchall()
+    columns = [desc[0] for desc in cursor.description]
+    orders = [dict(zip(columns, row)) for row in rows]
+    cursor.close()
+    conn.close()
+    return render_template("view_orders.html", orders=orders)
+
+
+
 
 # -------------------------
 # WhatsApp Webhook
