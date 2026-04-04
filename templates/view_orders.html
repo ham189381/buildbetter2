@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>All Customer Orders</title>
+    <style>
+        body { font-family: Arial; background: #dddada; }
+        .order-card { background: white; margin: 20px; padding: 15px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .order-card img { max-width: 200px; margin: 10px; border-radius: 5px; }
+        hr { margin: 15px 0; }
+        .order-info { margin: 10px 0; }
+        .order-info strong { display: inline-block; width: 150px; }
+    </style>
+</head>
+<body>
+<h2 style="text-align:center;">📦 Customer Orders</h2>
+{% for order in orders %}
+<div class="order-card">
+    <div class="order-info"><strong>Name:</strong> {{ order.name }}</div>
+    <div class="order-info"><strong>District:</strong> {{ order.district }}</div>
+    <div class="order-info"><strong>Town:</strong> {{ order.town }}</div>
+    <div class="order-info"><strong>Truck:</strong> {{ order.truck_name }}</div>
+    <div class="order-info"><strong>Material/Service:</strong> {{ order.material_service }}</div>
+    <div class="order-info"><strong>Location:</strong> {{ order.location }}</div>
+    <div class="order-info"><strong>Phone:</strong> <a href="tel:{{ order.phone }}">{{ order.phone }}</a></div>
+    <div class="order-info"><strong>Ordered on:</strong> {{ order.created_at }}</div>
+    <div>
+        {% if order.image1 %}
+            <img src="{{ order.image1 }}" alt="Order image 1">
+        {% endif %}
+        {% if order.image2 %}
+            <img src="{{ order.image2 }}" alt="Order image 2">
+        {% endif %}
+    </div>
+</div>
+{% endfor %}
+</body>
+</html>
