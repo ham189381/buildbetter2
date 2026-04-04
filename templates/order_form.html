@@ -9,8 +9,10 @@
         input, textarea, button { width: 100%; padding: 10px; margin: 8px 0; border-radius: 5px; border: 1px solid #ccc; box-sizing: border-box; }
         button { background: green; color: white; font-weight: bold; cursor: pointer; }
         .loc-btn { background: #2196F3; margin-bottom: 15px; }
+        .map-link { background: #FF9800; margin-top: 5px; }
         .image-group { display: flex; gap: 10px; }
         .image-group div { flex: 1; }
+        .coord-hint { font-size: 12px; color: #666; margin-top: -5px; margin-bottom: 10px; }
     </style>
 </head>
 <body>
@@ -23,9 +25,11 @@
         <input type="text" name="truck_name" placeholder="Truck Name / Type" required>
         <input type="text" name="material_service" placeholder="Material / Service (e.g., sand, transport)" required>
 
-        <label>📍 Your Location (auto‑filled)</label>
+        <label>📍 Your Location (coordinates)</label>
         <textarea name="location" id="location" rows="2" placeholder="Click the button below to get your location" readonly required></textarea>
+        <div class="coord-hint">Coordinates will be stored as latitude,longitude</div>
         <button type="button" class="loc-btn" onclick="getLocation()">📍 Get My Current Location</button>
+        <button type="button" class="map-link" onclick="viewOnMap()" style="background:#FF9800;">🗺️ Preview on Google Maps</button>
 
         <input type="tel" name="phone" placeholder="Phone Number" required>
 
@@ -45,6 +49,8 @@
 </div>
 
 <script>
+    let currentCoords = "";
+
     function getLocation() {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(showPosition, showError);
@@ -56,10 +62,18 @@
     function showPosition(position) {
         const lat = position.coords.latitude;
         const lon = position.coords.longitude;
-        // You can replace this with a reverse geocoding API if you want a human-readable address.
+        currentCoords = `${lat},${lon}`;
         const locationField = document.getElementById("location");
-        locationField.value = `Latitude: ${lat}, Longitude: ${lon}`;
+        locationField.value = currentCoords;
         locationField.style.background = "#e8f5e9";
+    }
+
+    function viewOnMap() {
+        if (currentCoords) {
+            window.open(`https://www.google.com/maps?q=${currentCoords}`, '_blank');
+        } else {
+            alert("First click 'Get My Current Location' to obtain coordinates.");
+        }
     }
 
     function showError(error) {
