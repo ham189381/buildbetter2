@@ -6,16 +6,14 @@
         body { font-family: Arial; background: #dddada; }
         .order-card { background: white; margin: 20px; padding: 15px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); position: relative; }
         .order-card img { max-width: 200px; margin: 10px; border-radius: 5px; }
+        hr { margin: 15px 0; }
         .order-info { margin: 10px 0; }
         .order-info strong { display: inline-block; width: 150px; }
         .actions { margin-top: 15px; }
         .actions a { display: inline-block; margin-right: 10px; padding: 5px 10px; text-decoration: none; border-radius: 4px; }
         .edit-btn { background: #2196F3; color: white; }
         .delete-btn { background: #f44336; color: white; }
-        .map-icon { background: none; font-size: 1.2em; margin-left: 10px; text-decoration: none; color: #1a73e8; }
     </style>
-    <!-- Font Awesome for a nicer map icon (optional) -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
 <h2 style="text-align:center;">📦 Customer Orders</h2>
@@ -26,14 +24,7 @@
     <div class="order-info"><strong>Town:</strong> {{ order.town }}</div>
     <div class="order-info"><strong>Truck:</strong> {{ order.truck_name }}</div>
     <div class="order-info"><strong>Material/Service:</strong> {{ order.material_service }}</div>
-    <div class="order-info">
-        <strong>Location:</strong> {{ order.location }}
-        {% if order.location and ',' in order.location %}
-            <a href="https://www.google.com/maps?q={{ order.location }}" target="_blank" class="map-icon" title="View on Google Maps">
-                <i class="fas fa-map-marker-alt"></i> 🗺️
-            </a>
-        {% endif %}
-    </div>
+    <div class="order-info"><strong>Location:</strong> {{ order.location }}</div>
     <div class="order-info"><strong>Phone:</strong> <a href="tel:{{ order.phone }}">{{ order.phone }}</a></div>
     <div class="order-info"><strong>Ordered on:</strong> {{ order.created_at }}</div>
     <div>
