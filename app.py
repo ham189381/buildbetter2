@@ -132,7 +132,7 @@ create_orders_table()
 # -------------------------
 @app.route("/")
 def home():
-    return render_template("sofery.html")
+    return render_template("index.html")
 
 @app.route('/prospect')
 def prospect():
