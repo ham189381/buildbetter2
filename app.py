@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, redirect, url_for
+from flask import Flask, request, render_template, redirect, url_for, send_from_directory
 from twilio.twiml.messaging_response import MessagingResponse
 from werkzeug.utils import secure_filename
 import psycopg2
@@ -7,24 +7,39 @@ import os
 app = Flask(__name__)
 
 # -------------------------
-# Configuration
+# Local File Upload Configuration
 # -------------------------
-UPLOAD_FOLDER = "static/uploads"
+UPLOAD_FOLDER = 'static/uploads'
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'bmp', 'webp'}
+
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+def save_image(file, prefix=""):
+    """Save uploaded file locally and return its URL path."""
+    if not file or not file.filename:
+        return ""
+    if not allowed_file(file.filename):
+        raise ValueError("File type not allowed")
+    filename = secure_filename(file.filename)
+    if prefix:
+        name, ext = os.path.splitext(filename)
+        filename = f"{prefix}_{name}{ext}"
+    filepath = os.path.join(UPLOAD_FOLDER, filename)
+    file.save(filepath)
+    return f"/uploads/{filename}"
 
 # -------------------------
-# Database connection
+# Database connection (local)
 # -------------------------
 def get_db_connection():
-    """Return a PostgreSQL connection.
-       Prefer using DATABASE_URL environment variable (e.g., on Render),
-       otherwise fall back to hardcoded local credentials."""
+    """Return a PostgreSQL connection for local development."""
     database_url = os.environ.get("DATABASE_URL")
     if database_url:
         return psycopg2.connect(database_url)
     else:
-        # Local development credentials
         return psycopg2.connect(
             host="127.0.0.1",
             database="drivers_db",
@@ -34,7 +49,7 @@ def get_db_connection():
         )
 
 # -------------------------
-# Helper to create tables
+# Create all tables (with location columns)
 # -------------------------
 def create_drivers_table():
     conn = get_db_connection()
@@ -44,13 +59,15 @@ def create_drivers_table():
             id SERIAL PRIMARY KEY,
             name TEXT,
             district TEXT,
-            division TEXT,
             town TEXT,
             phone TEXT,
             truck_name TEXT,
+            location TEXT,
             image1 TEXT,
             image2 TEXT,
-            image3 TEXT
+            image3 TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    
         )
     """)
     conn.commit()
@@ -77,16 +94,56 @@ def create_deals_table():
     cursor.close()
     conn.close()
 
-# Create tables when app starts
+def create_orders_table():
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS orders (
+            id SERIAL PRIMARY KEY,
+            name TEXT NOT NULL,
+            district TEXT,
+            town TEXT,
+            truck_name TEXT,
+            material_service TEXT,
+            location TEXT,
+            phone TEXT,
+            image1 TEXT,
+            image2 TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
+    conn.commit()
+    cursor.close()
+    conn.close()
+
+
+# Create all tables when app starts
 create_drivers_table()
 create_deals_table()
+create_orders_table()
 
 # -------------------------
-# Routes
+# Serve uploaded files
 # -------------------------
+@app.route('/uploads/<filename>')
+def uploaded_file(filename):
+    return send_from_directory(UPLOAD_FOLDER, filename)
+
+# -------------------------
+# Routes (unchanged except /driver POST)
+# -------------------------
+
 @app.route("/")
 def home():
-    return render_template("sofery.html")
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM drivers")
+    rows = cursor.fetchall()
+    columns = [desc[0] for desc in cursor.description]
+    drivers = [dict(zip(columns, row)) for row in rows]
+    cursor.close()
+    conn.close()
+    return render_template("sofery.html", drivers=drivers)
 
 @app.route('/prospect')
 def prospect():
@@ -110,6 +167,18 @@ def view_drivers():
     conn.close()
     return render_template("driverstable.html", drivers=drivers)
 
+@app.route("/alldrivercards")
+def alldrivercards():
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM drivers")
+    rows = cursor.fetchall()
+    columns = [desc[0] for desc in cursor.description]
+    drivers = [dict(zip(columns, row)) for row in rows]
+    cursor.close()
+    conn.close()
+    return render_template("alldrivercards.html", drivers=drivers)
+
 @app.route("/showdrivers")
 def driverpage():
     return render_template("driver.html")
@@ -131,7 +200,7 @@ def show_drivers_by_town(town):
     drivers = get_drivers_by_town(town)
     return render_template("spacifictowndrivers.html", drivers=drivers, town=town)
 
-# Static pages
+# Static pages (unchanged)
 @app.route('/kampaladistrict')
 def kampaladistrict():
     return render_template('kampaladivisions.html')
@@ -177,7 +246,7 @@ def kampala_ntinda():
     return render_template("kampala_ntinda_supplires.html")
 
 # -------------------------
-# Driver Registration
+# Driver Registration (UPDATED to handle location)
 # -------------------------
 @app.route("/driverdetails")
 def driverdetails():
@@ -188,32 +257,30 @@ def driver():
     if request.method == "POST":
         name = request.form["name"]
         district = request.form["district"]
-        division = request.form["division"]
         town = request.form["town"]
         phone = request.form["phone"]
         truck_name = request.form["truck_name"]
+        location = request.form["location"]
+    
 
-        image1 = request.files["image1"]
-        image2 = request.files["image2"]
-        image3 = request.files["image3"]
+       
 
-        filename1 = secure_filename(image1.filename) if image1 else ""
-        filename2 = secure_filename(image2.filename) if image2 else ""
-        filename3 = secure_filename(image3.filename) if image3 else ""
+        image1 = request.files.get("image1")
+        image2 = request.files.get("image2")
+        image3 = request.files.get("image3")
 
-        if filename1:
-            image1.save(os.path.join(app.config["UPLOAD_FOLDER"], filename1))
-        if filename2:
-            image2.save(os.path.join(app.config["UPLOAD_FOLDER"], filename2))
-        if filename3:
-            image3.save(os.path.join(app.config["UPLOAD_FOLDER"], filename3))
+        url1 = save_image(image1, f"driver_{name}_1")
+        url2 = save_image(image2, f"driver_{name}_2")
+        url3 = save_image(image3, f"driver_{name}_3")
 
         conn = get_db_connection()
         cursor = conn.cursor()
         cursor.execute("""
-            INSERT INTO drivers (name, district, division, town, phone, truck_name, image1, image2, image3)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
-        """, (name, district, division, town, phone, truck_name, filename1, filename2, filename3))
+            INSERT INTO drivers (name, district, town, phone, truck_name,
+                                 location,image1, image2, image3)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s,%s)
+        """, (name, district, town, phone, truck_name,
+              location,url1, url2, url3))
         conn.commit()
         cursor.close()
         conn.close()
@@ -247,7 +314,7 @@ def alldrivers():
     return render_template("alldriversview.html", data=data)
 
 # -------------------------
-# Deals Section
+# Deals Section (unchanged)
 # -------------------------
 @app.route("/deals")
 def deals():
@@ -261,23 +328,18 @@ def save():
     location = request.form["location"]
     phone = request.form["phone"]
 
-    image1 = request.files["imageone"]
-    image2 = request.files["image2"]
+    image1 = request.files.get("imageone")
+    image2 = request.files.get("image2")
 
-    filename1 = secure_filename(image1.filename) if image1 else ""
-    filename2 = secure_filename(image2.filename) if image2 else ""
-
-    if filename1:
-        image1.save(os.path.join(app.config["UPLOAD_FOLDER"], filename1))
-    if filename2:
-        image2.save(os.path.join(app.config["UPLOAD_FOLDER"], filename2))
+    url1 = save_image(image1, f"deal_{suppliername}_1")
+    url2 = save_image(image2, f"deal_{suppliername}_2")
 
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute("""
         INSERT INTO deals (suppliername, materialname, tippername, location, phone, imageone, imagetwo)
         VALUES (%s, %s, %s, %s, %s, %s, %s)
-    """, (suppliername, materialname, tippername, location, phone, filename1, filename2))
+    """, (suppliername, materialname, tippername, location, phone, url1, url2))
     conn.commit()
     cursor.close()
     conn.close()
@@ -325,7 +387,121 @@ def dealspage():
     return render_template("dealspage.html")
 
 # -------------------------
-# WhatsApp Webhook
+# Orders Table (unchanged)
+# -------------------------
+@app.route("/order")
+def order_form():
+    return render_template("order_form.html")
+
+@app.route("/submit_order", methods=["POST"])
+def submit_order():
+    name = request.form["name"]
+    district = request.form["district"]
+    town = request.form["town"]
+    truck_name = request.form["truck_name"]
+    material_service = request.form["material_service"]
+    location = request.form["location"]
+    phone = request.form["phone"]
+
+    image1 = request.files.get("image1")
+    image2 = request.files.get("image2")
+
+    url1 = save_image(image1, f"order_{name}_1")
+    url2 = save_image(image2, f"order_{name}_2")
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("""
+        INSERT INTO orders (name, district, town, truck_name, material_service, location, phone, image1, image2)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+    """, (name, district, town, truck_name, material_service, location, phone, url1, url2))
+    conn.commit()
+    cursor.close()
+    conn.close()
+
+    return "Your order has been placed successfully! We will contact you soon."
+
+@app.route("/view_orders")
+def view_orders():
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM orders ORDER BY created_at DESC")
+    rows = cursor.fetchall()
+    columns = [desc[0] for desc in cursor.description]
+    orders = [dict(zip(columns, row)) for row in rows]
+    cursor.close()
+    conn.close()
+    return render_template("view_orders.html", orders=orders)
+
+@app.route("/edit_order/<int:order_id>")
+def edit_order_form(order_id):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM orders WHERE id = %s", (order_id,))
+    row = cursor.fetchone()
+    if not row:
+        cursor.close()
+        conn.close()
+        return "Order not found", 404
+    columns = [desc[0] for desc in cursor.description]
+    order = dict(zip(columns, row))
+    cursor.close()
+    conn.close()
+    return render_template("edit_order.html", order=order)
+
+@app.route("/update_order/<int:order_id>", methods=["POST"])
+def update_order(order_id):
+    name = request.form["name"]
+    district = request.form["district"]
+    town = request.form["town"]
+    truck_name = request.form["truck_name"]
+    material_service = request.form["material_service"]
+    location = request.form["location"]
+    phone = request.form["phone"]
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT image1, image2 FROM orders WHERE id = %s", (order_id,))
+    old = cursor.fetchone()
+    if not old:
+        cursor.close()
+        conn.close()
+        return "Order not found", 404
+    old_image1, old_image2 = old
+
+    image1 = request.files.get("image1")
+    image2 = request.files.get("image2")
+
+    url1 = old_image1
+    if image1 and image1.filename:
+        url1 = save_image(image1, f"order_{name}_1")
+
+    url2 = old_image2
+    if image2 and image2.filename:
+        url2 = save_image(image2, f"order_{name}_2")
+
+    cursor.execute("""
+        UPDATE orders
+        SET name=%s, district=%s, town=%s, truck_name=%s, material_service=%s, location=%s, phone=%s, image1=%s, image2=%s
+        WHERE id=%s
+    """, (name, district, town, truck_name, material_service, location, phone, url1, url2, order_id))
+    conn.commit()
+    cursor.close()
+    conn.close()
+    return redirect(url_for('view_orders'))
+
+@app.route("/delete_order/<int:order_id>")
+def delete_order(order_id):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM orders WHERE id = %s", (order_id,))
+    conn.commit()
+    cursor.close()
+    conn.close()
+    return redirect(url_for('view_orders'))
+
+# -------------------------
+# WhatsApp Webhook (unchanged)
 # -------------------------
 @app.route('/whatsapp', methods=['POST'])
 def whatsapp_reply():
@@ -345,7 +521,7 @@ def whatsapp_reply():
     return str(resp)
 
 # -------------------------
-# Search drivers by district & town
+# Search drivers by district & town (unchanged)
 # -------------------------
 @app.route("/searchdriverbydt")
 def searchdriverbydt():
@@ -372,6 +548,28 @@ def search_driversby():
     conn.close()
 
     return render_template("drivers_results.html", drivers=drivers)
+
+# ROUTE  THAT CREATES A LINK TO A PARTICULAR DRIVER CARD DETAILS
+
+@app.route('/driver_details/<int:driver_id>')
+def driver_details(driver_id):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM drivers WHERE id = %s", (driver_id,))
+    row = cursor.fetchone()
+    
+    if not row:
+        cursor.close()
+        conn.close()
+        return "Driver not found", 404
+    
+    columns = [desc[0] for desc in cursor.description]
+    driver = dict(zip(columns, row))
+    
+    cursor.close()
+    conn.close()
+    
+    return render_template("driver_details.html", driver=driver)
 
 # -------------------------
 # Run the app
